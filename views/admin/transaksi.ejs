@@ -1,0 +1,54 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">🧾</div>
+  <div>
+    <span class="page-kicker">Transaksi</span>
+    <h1>Kelola Transaksi</h1>
+    <p class="subtitle">Pantau &amp; perbarui status semua pesanan pelanggan.</p>
+  </div>
+</div>
+
+<form action="/admin/transaksi" method="GET" class="filter-bar">
+  <div class="field">
+    <label for="dari">Dari Tanggal</label>
+    <input type="date" id="dari" name="dari" value="<%= dari %>" />
+  </div>
+  <div class="field">
+    <label for="sampai">Sampai Tanggal</label>
+    <input type="date" id="sampai" name="sampai" value="<%= sampai %>" />
+  </div>
+  <button type="submit" class="btn">Terapkan Filter</button>
+  <a href="/admin/transaksi" class="btn btn-outline btn-sm filter-bar-reset">Reset (30 Hari Terakhir)</a>
+</form>
+
+<% if (pesananList.length === 0) { %>
+  <div class="empty-state">Tidak ada transaksi pada rentang <%= dari %> s/d <%= sampai %>.</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>No.</th><th>Pelanggan</th><th>Tanggal</th><th>Total</th><th>Status Pesanan</th><th>Pembayaran</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% pesananList.forEach(p => { %>
+          <tr>
+            <td>#<%= p.id_pesanan %></td>
+            <td><%= p.nama_pelanggan || p.users?.nama || '-' %></td>
+            <td><%= new Date(p.tanggal).toLocaleString('id-ID') %></td>
+            <td>Rp <%= Number(p.total).toLocaleString('id-ID') %></td>
+            <td><span class="status status-<%= p.status.toLowerCase().replace(/ /g, '-') %>"><%= p.status %></span></td>
+            <td>
+              <% const bayar = p.pembayaran?.[0]; %>
+              <%= bayar ? bayar.metode || '-' : '-' %>
+              <% if (bayar) { %> · <span class="status status-<%= bayar.status.toLowerCase() %>"><%= bayar.status %></span><% } %>
+            </td>
+            <td><a href="/admin/transaksi/<%= p.id_pesanan %>" class="btn btn-outline btn-sm">Detail</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/admin-footer') %>

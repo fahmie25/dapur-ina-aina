@@ -1,0 +1,62 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">🧾</div>
+  <div>
+    <span class="page-kicker">Detail Transaksi</span>
+    <h1>Pesanan #<%= pesanan.id_pesanan %></h1>
+    <p class="subtitle">Pelanggan: <strong><%= pesanan.nama_pelanggan || pesanan.users?.nama || '-' %></strong> · WhatsApp: <%= pesanan.no_telp || '-' %></p>
+  </div>
+</div>
+
+<div class="receipt" style="margin-bottom:28px;">
+  <% pesanan.detail_pesanan.forEach(d => { %>
+    <div class="receipt-row">
+      <span><%= d.produk?.nama_produk %> &times; <%= d.jumlah %></span>
+      <span>Rp <%= Number(d.subtotal).toLocaleString('id-ID') %></span>
+    </div>
+  <% }) %>
+  <div class="receipt-row receipt-total">
+    <span>Total</span>
+    <span>Rp <%= Number(pesanan.total).toLocaleString('id-ID') %></span>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; max-width:700px;">
+  <div class="card">
+    <h3>Ubah Status Pesanan</h3>
+    <form action="/admin/transaksi/<%= pesanan.id_pesanan %>/status?_method=PUT" method="POST">
+      <div class="field">
+        <label>Status</label>
+        <select name="status">
+          <% ['Menunggu Pembayaran','Dibayar','Diproses','Selesai','Dibatalkan'].forEach(s => { %>
+            <option value="<%= s %>" <%= pesanan.status === s ? 'selected' : '' %>><%= s %></option>
+          <% }) %>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-block">Simpan Perubahan</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Pembayaran</h3>
+    <% const bayar = pesanan.pembayaran?.[0]; %>
+    <% if (bayar) { %>
+      <p class="muted" style="margin-bottom:6px;">Metode: <%= bayar.metode || '-' %></p>
+      <p class="muted" style="margin-bottom:14px;">Status: <span class="status status-<%= bayar.status.toLowerCase() %>"><%= bayar.status %></span></p>
+      <% if (bayar.metode === 'Tunai' && bayar.status === 'Pending') { %>
+        <form action="/admin/transaksi/<%= pesanan.id_pesanan %>/konfirmasi-tunai?_method=PUT" method="POST">
+          <button type="submit" class="btn btn-chili btn-block">Konfirmasi Pembayaran Tunai</button>
+        </form>
+      <% } %>
+    <% } else { %>
+      <p class="muted">Belum ada data pembayaran.</p>
+    <% } %>
+  </div>
+</div>
+
+<div class="mt-24">
+  <a href="/admin/transaksi" class="btn btn-outline">&larr; Kembali ke Daftar Transaksi</a>
+</div>
+
+<%- include('../partials/admin-footer') %>

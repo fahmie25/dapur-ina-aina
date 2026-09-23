@@ -1,0 +1,61 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">✏️</div>
+  <div>
+    <span class="page-kicker">Edit Produk</span>
+    <h1><%= produk.nama_produk %></h1>
+  </div>
+</div>
+
+<div class="card" style="max-width:480px;">
+  <form action="/admin/stok/produk/<%= produk.id_produk %>?_method=PUT" method="POST">
+    <div class="field">
+      <label>Foto Saat Ini</label>
+      <% if (produk.gambar_url) { %>
+        <img src="<%= produk.gambar_url %>" alt="<%= produk.nama_produk %>" class="produk-thumb produk-thumb-lg" />
+      <% } else { %>
+        <span class="produk-thumb produk-thumb-lg produk-thumb-empty" aria-hidden="true">🍽️</span>
+      <% } %>
+    </div>
+    <div class="field">
+      <label>Link Foto Produk (opsional)</label>
+      <input type="url" name="gambar_url" value="<%= produk.gambar_url || '' %>" placeholder="https://contoh.com/foto-nasi-goreng.jpg" />
+    </div>
+    <div class="field">
+      <label>Nama Produk</label>
+      <input type="text" name="nama_produk" value="<%= produk.nama_produk %>" required />
+    </div>
+    <div class="field">
+      <label>Kategori</label>
+      <select name="id_kategori" required>
+        <% kategoriList.forEach(k => { %>
+          <option value="<%= k.id_kategori %>" <%= k.id_kategori === produk.id_kategori ? 'selected' : '' %>><%= k.nama_kategori %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Harga (Rp)</label>
+        <input type="number" name="harga" value="<%= produk.harga %>" min="0" required />
+      </div>
+      <div class="field">
+        <label>Stok</label>
+        <input type="number" name="stok" value="<%= produk.stok %>" min="0" required />
+      </div>
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select name="status">
+        <option value="Tersedia" <%= produk.status === 'Tersedia' ? 'selected' : '' %>>Tersedia</option>
+        <option value="Habis" <%= produk.status === 'Habis' ? 'selected' : '' %>>Habis</option>
+      </select>
+    </div>
+    <div class="flex-between">
+      <a href="/admin/stok/produk" class="btn btn-outline">Batal</a>
+      <button type="submit" class="btn">Simpan Perubahan</button>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/admin-footer') %>

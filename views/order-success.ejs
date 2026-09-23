@@ -1,0 +1,126 @@
+<%- include('partials/header') %>
+
+<%
+  const invoiceNumber = `INV-${new Date(pesanan.tanggal).toISOString().slice(0, 10).replace(/-/g, '')}-${String(pesanan.id_pesanan).padStart(4, '0')}`;
+  const paymentStatus = pembayaran?.status || 'Pending';
+  const paymentMethod = pembayaran?.metode || 'Belum dipilih';
+  const isPaid = paymentStatus === 'Berhasil';
+  const isCashPending = paymentMethod === 'Tunai' && paymentStatus === 'Pending';
+%>
+
+<div class="billing-page">
+  <div class="billing-topbar no-print">
+    <a href="/menu" class="billing-back">← Kembali ke Menu</a>
+    <button type="button" class="btn btn-outline" onclick="window.print()">🖨 Cetak Billing</button>
+  </div>
+
+  <div class="billing-status-card <%= isPaid ? 'is-paid' : 'is-pending' %>">
+    <div class="billing-status-icon"><%= isPaid ? '✓' : '!' %></div>
+    <div>
+      <div class="billing-status-label"><%= isPaid ? 'PEMBAYARAN BERHASIL' : 'PESANAN BERHASIL DIBUAT' %></div>
+      <h1><%= isPaid ? 'Terima kasih atas pembayaran Anda' : 'Billing Anda sudah siap' %></h1>
+      <p>
+        <% if (isPaid) { %>
+          Pembayaran untuk pesanan ini sudah diterima. Simpan billing ini sebagai bukti transaksi.
+        <% } else if (isCashPending) { %>
+          Silakan lakukan pembayaran tunai kepada kasir. Pesanan akan dikonfirmasi setelah pembayaran diterima.
+        <% } else { %>
+          Silakan lanjutkan pembayaran menggunakan metode yang dipilih. Status billing akan diperbarui setelah pembayaran diterima.
+        <% } %>
+      </p>
+    </div>
+  </div>
+
+  <section class="billing-receipt" id="billing">
+    <header class="billing-brand">
+      <div>
+        <div class="billing-logo">Dapur <span>Ina Aina</span></div>
+        <p>Restoran &amp; Pemesanan Makanan</p>
+      </div>
+      <div class="billing-title">
+        <strong>BILLING</strong>
+        <span><%= invoiceNumber %></span>
+      </div>
+    </header>
+
+    <div class="billing-divider"></div>
+
+    <div class="billing-meta-grid">
+      <div>
+        <span class="billing-label">PELANGGAN</span>
+        <strong><%= pesanan.nama_pelanggan %></strong>
+        <span><%= pesanan.no_telp %></span>
+      </div>
+      <div>
+        <span class="billing-label">INFORMASI PESANAN</span>
+        <strong>#<%= pesanan.id_pesanan %></strong>
+        <span><%= new Date(pesanan.tanggal).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) %></span>
+      </div>
+    </div>
+
+    <div class="billing-items">
+      <div class="billing-item billing-item-head">
+        <span>PRODUK</span>
+        <span>QTY</span>
+        <span>HARGA</span>
+        <span>SUBTOTAL</span>
+      </div>
+
+      <% pesanan.detail_pesanan.forEach(d => { %>
+        <div class="billing-item">
+          <div class="billing-product">
+            <strong><%= d.produk?.nama_produk || 'Produk' %></strong>
+            <small>Rp <%= Number(d.harga).toLocaleString('id-ID') %> / item</small>
+          </div>
+          <span><%= d.jumlah %></span>
+          <span>Rp <%= Number(d.harga).toLocaleString('id-ID') %></span>
+          <strong>Rp <%= Number(d.subtotal).toLocaleString('id-ID') %></strong>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="billing-total-box">
+      <div class="billing-total-row">
+        <span>Subtotal</span>
+        <strong>Rp <%= Number(pesanan.total).toLocaleString('id-ID') %></strong>
+      </div>
+      <div class="billing-total-row billing-grand-total">
+        <span>TOTAL TAGIHAN</span>
+        <strong>Rp <%= Number(pesanan.total).toLocaleString('id-ID') %></strong>
+      </div>
+    </div>
+
+    <div class="billing-payment">
+      <div class="billing-payment-method">
+        <span class="billing-label">METODE PEMBAYARAN</span>
+        <strong><%= paymentMethod %></strong>
+      </div>
+      <div class="billing-payment-status">
+        <span class="billing-label">STATUS PEMBAYARAN</span>
+        <span class="status status-<%= paymentStatus.toLowerCase().replace(/ /g, '-') %>"><%= paymentStatus %></span>
+      </div>
+    </div>
+
+    <% if (pembayaran && paymentMethod === 'Tunai' && Number(pembayaran.jumlah_bayar) > 0) { %>
+      <div class="billing-cash-detail">
+        <div><span>Uang diterima</span><strong>Rp <%= Number(pembayaran.jumlah_bayar).toLocaleString('id-ID') %></strong></div>
+        <div><span>Kembalian</span><strong>Rp <%= Number(pembayaran.kembalian || 0).toLocaleString('id-ID') %></strong></div>
+      </div>
+    <% } %>
+
+    <footer class="billing-footer">
+      <strong>Terima kasih telah memilih Dapur Ina Aina.</strong>
+      <span>Billing ini dibuat secara otomatis oleh sistem.</span>
+    </footer>
+  </section>
+
+  <div class="billing-actions no-print">
+    <% if (!isPaid && paymentStatus === 'Pending' && !isCashPending) { %>
+      <a href="/payment/<%= pesanan.id_pesanan %>" class="btn">Lanjutkan Pembayaran</a>
+    <% } %>
+    <a href="/my-orders" class="btn btn-outline">Lihat Pesanan Saya</a>
+    <a href="/menu" class="btn btn-outline">Pesan Lagi</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

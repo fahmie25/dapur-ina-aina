@@ -1,0 +1,78 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">📊</div>
+  <div>
+    <span class="page-kicker">Laporan</span>
+    <h1>Laporan Penjualan</h1>
+    <p class="subtitle">Pantau performa penjualan berdasarkan periode pilihan Anda.</p>
+  </div>
+</div>
+
+<div class="pill-row">
+  <a class="pill <%= periode === 'mingguan' ? 'active' : '' %>" href="/admin/laporan?periode=mingguan">Mingguan</a>
+  <a class="pill <%= periode === 'bulanan' ? 'active' : '' %>" href="/admin/laporan?periode=bulanan">Bulanan</a>
+  <a class="pill <%= periode === 'tahunan' ? 'active' : '' %>" href="/admin/laporan?periode=tahunan">Tahunan</a>
+</div>
+
+<form action="/admin/laporan" method="GET" class="filter-bar">
+  <input type="hidden" name="periode" value="<%= periode %>" />
+
+  <% if (periode === 'mingguan') { %>
+    <div class="field">
+      <label for="tanggal">Pilih tanggal dalam minggu tersebut</label>
+      <input type="date" id="tanggal" name="tanggal" value="<%= pivotValue %>" />
+    </div>
+  <% } else if (periode === 'tahunan') { %>
+    <div class="field">
+      <label for="tahun">Pilih Tahun</label>
+      <input type="number" id="tahun" name="tahun" min="2000" max="2100" value="<%= pivotValue %>" />
+    </div>
+  <% } else { %>
+    <div class="field">
+      <label for="bulan">Pilih Bulan</label>
+      <input type="month" id="bulan" name="bulan" value="<%= pivotValue %>" />
+    </div>
+  <% } %>
+
+  <button type="submit" class="btn">Terapkan</button>
+  <span class="muted" style="align-self:center;">Menampilkan: <strong><%= rentangLabel %></strong></span>
+</form>
+
+<% if (!dataAda) { %>
+  <div class="empty-state">Tidak ada data transaksi pada periode ini (<%= rentangLabel %>). Coba pilih periode lain.</div>
+<% } else { %>
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="value">Rp <%= totalPenjualan.toLocaleString('id-ID') %></div>
+      <div class="label">Total Penjualan</div>
+    </div>
+    <div class="stat-card">
+      <div class="value"><%= jumlahTransaksi %></div>
+      <div class="label">Jumlah Transaksi</div>
+    </div>
+    <div class="stat-card">
+      <div class="value">Rp <%= Math.round(totalPenjualan / jumlahTransaksi).toLocaleString('id-ID') %></div>
+      <div class="label">Rata-rata per Transaksi</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>No.</th><th>Pelanggan</th><th>Tanggal</th><th>Total</th><th>Status</th></tr></thead>
+      <tbody>
+        <% transaksiList.forEach(t => { %>
+          <tr>
+            <td>#<%= t.id_pesanan %></td>
+            <td><%= t.nama_pelanggan || t.users?.nama || '-' %></td>
+            <td><%= new Date(t.tanggal).toLocaleString('id-ID') %></td>
+            <td>Rp <%= Number(t.total).toLocaleString('id-ID') %></td>
+            <td><span class="status status-<%= t.status.toLowerCase().replace(/ /g, '-') %>"><%= t.status %></span></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/admin-footer') %>

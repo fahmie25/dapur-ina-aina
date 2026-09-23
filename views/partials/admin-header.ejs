@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof title !== 'undefined' ? title + ' · Admin Dapur Ina Aina' : 'Admin Dapur Ina Aina' %></title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+  <%- include('admin-sidebar') %>
+
+  <div class="admin-main-col">
+    <div class="admin-topbar">
+      <button class="admin-sidebar-toggle" type="button" aria-label="Buka menu" data-sidebar-toggle>☰</button>
+      <span class="admin-topbar-title"><%= typeof title !== 'undefined' ? title : 'Admin' %></span>
+    </div>
+
+    <main class="admin-main">
+      <div class="container admin-container">
+        <% if (typeof success !== 'undefined' && success.length) { %>
+          <% success.forEach(msg => { %>
+            <div class="flash flash-success"><%= msg %></div>
+          <% }) %>
+        <% } %>
+        <% if (typeof error !== 'undefined' && error.length) { %>
+          <% error.forEach(msg => { %>
+            <div class="flash flash-error"><%= msg %></div>
+          <% }) %>
+        <% } %>

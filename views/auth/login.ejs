@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+
+<div class="auth-wrap">
+  <div class="auth-brand">
+    <span class="brand-mark" aria-hidden="true">🍽</span>
+    <div>
+      <strong>Dapur Ina Aina</strong>
+      <span>Portal Administrator</span>
+    </div>
+  </div>
+  <h1>Login Admin</h1>
+  <p class="muted">Halaman ini khusus administrator untuk mengelola stok, transaksi, dan laporan penjualan.</p>
+
+  <form action="/login" method="POST">
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required autofocus />
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <button type="submit" class="btn btn-block">Masuk</button>
+  </form>
+
+  <p class="auth-switch"><a href="/menu">← Kembali ke menu pelanggan</a></p>
+</div>
+
+<%- include('../partials/footer') %>

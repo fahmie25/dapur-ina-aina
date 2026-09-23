@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<script
+  src="<%= isProduction ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' %>"
+  data-client-key="<%= midtransClientKey %>">
+</script>
+
+<div class="page-header">
+  <span class="page-kicker">Pembayaran</span>
+  <h1>Pesanan #<%= pesanan.id_pesanan %></h1>
+  <p class="subtitle">Total tagihan Anda, silakan pilih metode pembayaran.</p>
+</div>
+
+<div class="receipt">
+  <% pesanan.detail_pesanan.forEach(d => { %>
+    <div class="receipt-row">
+      <span><%= d.produk?.nama_produk %> &times; <%= d.jumlah %></span>
+      <span>Rp <%= Number(d.subtotal).toLocaleString('id-ID') %></span>
+    </div>
+  <% }) %>
+  <div class="receipt-row receipt-total">
+    <span>Total Tagihan</span>
+    <span>Rp <%= Number(pesanan.total).toLocaleString('id-ID') %></span>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; max-width:640px; margin: 28px auto 0;">
+  <div class="card payment-option">
+    <div class="payment-option-icon">💵</div>
+    <h3>Bayar di Kasir (Tunai)</h3>
+    <p class="muted">Catat pembayaran tunai, lalu selesaikan &amp; konfirmasi langsung di kasir toko.</p>
+    <form action="/payment/<%= pesanan.id_pesanan %>/tunai" method="POST">
+      <div class="field">
+        <label for="jumlah_bayar">Jumlah Dibayarkan</label>
+        <input type="number" id="jumlah_bayar" name="jumlah_bayar" min="<%= Math.round(Number(pesanan.total)) %>" step="500" required />
+      </div>
+      <button type="submit" class="btn btn-outline btn-block">Catat Pembayaran Tunai</button>
+    </form>
+  </div>
+
+  <div class="card payment-option is-chili">
+    <div class="payment-option-icon">💳</div>
+    <h3>Bayar Online</h3>
+    <p class="muted">Transfer bank, QRIS, e-wallet, atau kartu — diproses otomatis lewat Midtrans.</p>
+    <button id="btn-bayar-online" class="btn btn-chili btn-block">Bayar Sekarang</button>
+    <p id="online-error" class="muted" style="color:#A2361F; display:none; margin-top:10px;"></p>
+  </div>
+</div>
+
+<script>
+  document.getElementById('btn-bayar-online').addEventListener('click', async function () {
+    const btn = this;
+    const errorEl = document.getElementById('online-error');
+    errorEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+
+    try {
+      const res = await fetch('/payment/<%= pesanan.id_pesanan %>/online', { method: 'POST' });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Gagal memulai pembayaran.');
+
+      window.snap.pay(data.snap_token, {
+        onSuccess: function () { window.location.href = '/order/success/<%= pesanan.id_pesanan %>'; },
+        onPending: function () { window.location.href = '/order/success/<%= pesanan.id_pesanan %>'; },
+        onError: function () {
+          errorEl.textContent = 'Pembayaran gagal diproses. Silakan coba lagi.';
+          errorEl.style.display = 'block';
+        },
+        onClose: function () {
+          btn.disabled = false;
+          btn.textContent = 'Bayar Sekarang';
+        },
+      });
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Bayar Sekarang';
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>

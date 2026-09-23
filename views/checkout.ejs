@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <span class="page-kicker">Checkout</span>
+  <h1>Satu Langkah Lagi</h1>
+  <p class="subtitle">Isi data pelanggan, lalu lanjutkan ke pembayaran. Tidak perlu login atau membuat akun.</p>
+</div>
+
+<div class="grid checkout-grid">
+  <div class="card">
+    <h3>Data Pelanggan</h3>
+    <form action="/checkout/place" method="POST">
+      <div class="field">
+        <label for="nama_pelanggan">Nama Pelanggan</label>
+        <input type="text" id="nama_pelanggan" name="nama_pelanggan" maxlength="50" required placeholder="Nama Anda" />
+      </div>
+      <div class="field">
+        <label for="no_telp">Nomor WhatsApp / Telepon</label>
+        <input type="tel" id="no_telp" name="no_telp" maxlength="20" required placeholder="08xxxxxxxxxx" />
+      </div>
+      <button type="submit" class="btn btn-block">Buat Pesanan &amp; Lanjut Pembayaran</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Ringkasan Pesanan</h3>
+    <div class="receipt">
+      <% cart.forEach(item => { %>
+        <div class="receipt-row">
+          <span><%= item.nama_produk %> × <%= item.jumlah %></span>
+          <span>Rp <%= (item.harga * item.jumlah).toLocaleString('id-ID') %></span>
+        </div>
+      <% }) %>
+      <div class="receipt-row receipt-total">
+        <span>Total</span>
+        <span>Rp <%= total.toLocaleString('id-ID') %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

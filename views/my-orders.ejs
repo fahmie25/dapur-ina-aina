@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <span class="page-kicker">Riwayat</span>
+  <h1>Pesanan Saya</h1>
+  <p class="subtitle">Riwayat pesanan pada perangkat/browser ini. Pelanggan tidak perlu login.</p>
+</div>
+
+<% if (pesananList.length === 0) { %>
+  <div class="empty-state">Belum ada pesanan. <a href="/menu">Mulai pesan sekarang</a>.</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>No. Pesanan</th><th>Pelanggan</th><th>Tanggal</th><th>Total</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% pesananList.forEach(p => { %>
+          <tr>
+            <td>#<%= p.id_pesanan %></td>
+            <td><%= p.nama_pelanggan %></td>
+            <td><%= new Date(p.tanggal).toLocaleString('id-ID') %></td>
+            <td>Rp <%= Number(p.total).toLocaleString('id-ID') %></td>
+            <td><span class="status status-<%= p.status.toLowerCase().replace(/ /g, '-') %>"><%= p.status %></span></td>
+            <td><a href="/order/success/<%= p.id_pesanan %>" class="btn btn-outline btn-sm">Lihat</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

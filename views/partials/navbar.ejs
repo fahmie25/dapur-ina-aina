@@ -1,0 +1,49 @@
+<nav class="navbar site-navbar">
+  <div class="container nav-shell">
+    <a href="<%= (typeof user !== 'undefined' && user && user.role === 'admin') ? '/admin' : '/' %>" class="brand brand-modern" aria-label="Dapur Ina Aina">
+      <span class="brand-mark" aria-hidden="true">🍽</span>
+      <span class="brand-copy"><strong>Dapur</strong> <em>Ina Aina</em><small>Rasa rumahan, cara modern.</small></span>
+    </a>
+
+    <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+      <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" data-nav-toggle>☰</button>
+      <div class="nav-links admin-nav-links" data-nav-menu>
+        <a class="<%= path === '/admin' ? 'active' : '' %>" href="/admin">Dashboard</a>
+        <a class="<%= path.startsWith('/admin/stok/produk') ? 'active' : '' %>" href="/admin/stok/produk">Produk &amp; Stok</a>
+        <a class="<%= path.startsWith('/admin/stok/kategori') ? 'active' : '' %>" href="/admin/stok/kategori">Kategori</a>
+        <a class="<%= path.startsWith('/admin/transaksi') ? 'active' : '' %>" href="/admin/transaksi">Transaksi</a>
+        <a class="<%= path.startsWith('/admin/laporan') ? 'active' : '' %>" href="/admin/laporan">Laporan</a>
+        <span class="nav-user"><span class="nav-user-dot"></span><%= user.nama %></span>
+        <form action="/logout" method="POST">
+          <button type="submit" class="link-btn nav-logout">Keluar</button>
+        </form>
+      </div>
+    <% } else { %>
+      <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" data-nav-toggle>☰</button>
+      <div class="nav-links customer-nav-links" data-nav-menu>
+        <a class="<%= path === '/' ? 'active' : '' %>" href="/">Beranda</a>
+        <a class="<%= path.startsWith('/menu') ? 'active' : '' %>" href="/menu">Menu</a>
+        <a class="<%= path.startsWith('/my-orders') ? 'active' : '' %>" href="/my-orders">Pesanan Saya</a>
+        <a class="nav-cart" href="/cart" aria-label="Keranjang">
+          <span aria-hidden="true">🛒</span>
+          Keranjang
+          <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %><span class="cart-badge"><%= cartCount %></span><% } %>
+        </a>
+        <a class="nav-admin-link" href="/login"><span aria-hidden="true">⚙</span> Admin</a>
+      </div>
+    <% } %>
+  </div>
+</nav>
+
+<script>
+  (() => {
+    const toggle = document.querySelector('[data-nav-toggle]');
+    const menu = document.querySelector('[data-nav-menu]');
+    if (!toggle || !menu) return;
+    toggle.addEventListener('click', () => {
+      const open = menu.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? '✕' : '☰';
+    });
+  })();
+</script>

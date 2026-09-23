@@ -1,0 +1,54 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header">
+  <span class="page-kicker">Dashboard</span>
+  <h1>Halo, <%= user.nama %> 👋</h1>
+  <p class="subtitle">Ringkasan operasional Dapur Ina Aina: stok, transaksi, pembayaran, dan penjualan.</p>
+</div>
+
+<div class="dashboard-stats">
+  <div class="stat-card"><span>Total Produk</span><strong><%= stats.produk %></strong><small>Semua menu</small></div>
+  <div class="stat-card"><span>Produk Tersedia</span><strong><%= stats.tersedia %></strong><small>Siap dipesan</small></div>
+  <div class="stat-card"><span>Stok Habis</span><strong><%= stats.habis %></strong><small>Perlu diperbarui</small></div>
+  <div class="stat-card"><span>Total Transaksi</span><strong><%= stats.transaksi %></strong><small>Semua pesanan</small></div>
+  <div class="stat-card"><span>Menunggu Bayar</span><strong><%= stats.menunggu %></strong><small>Perlu dipantau</small></div>
+  <div class="stat-card"><span>Pembayaran Berhasil</span><strong><%= stats.dibayar %></strong><small>Billing berhasil</small></div>
+  <div class="stat-card stat-wide"><span>Total Penjualan</span><strong>Rp <%= stats.totalPenjualan.toLocaleString('id-ID') %></strong><small>Pesanan dibayar/diproses/selesai</small></div>
+</div>
+
+<div class="dashboard-actions">
+  <a href="/admin/stok/produk" class="btn">Kelola Produk &amp; Stok</a>
+  <a href="/admin/stok/kategori" class="btn btn-outline">Kelola Kategori</a>
+  <a href="/admin/transaksi" class="btn btn-outline">Kelola Transaksi</a>
+  <a href="/admin/laporan?periode=mingguan" class="btn btn-outline">Laporan Mingguan</a>
+  <a href="/admin/laporan?periode=bulanan" class="btn btn-outline">Laporan Bulanan</a>
+  <a href="/admin/laporan?periode=tahunan" class="btn btn-outline">Laporan Tahunan</a>
+</div>
+
+<div class="page-header" style="margin-top:34px;">
+  <h2>Transaksi Terbaru</h2>
+</div>
+
+<% if (!pesananTerbaru.length) { %>
+  <div class="empty-state">Belum ada transaksi.</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>No.</th><th>Pelanggan</th><th>Tanggal</th><th>Total</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% pesananTerbaru.forEach(p => { %>
+          <tr>
+            <td>#<%= p.id_pesanan %></td>
+            <td><%= p.nama_pelanggan || '-' %></td>
+            <td><%= new Date(p.tanggal).toLocaleString('id-ID') %></td>
+            <td>Rp <%= Number(p.total).toLocaleString('id-ID') %></td>
+            <td><span class="status status-<%= p.status.toLowerCase().replace(/ /g, '-') %>"><%= p.status %></span></td>
+            <td><a href="/admin/transaksi/<%= p.id_pesanan %>" class="btn btn-outline btn-sm">Detail</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/admin-footer') %>

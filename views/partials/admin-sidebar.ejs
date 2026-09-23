@@ -1,0 +1,56 @@
+<aside class="admin-sidebar" data-sidebar>
+  <a href="/admin" class="admin-brand">
+    <span class="brand-mark" aria-hidden="true">🍽</span>
+    <span class="admin-brand-copy">
+      <strong>Dapur Ina Aina</strong>
+      <small>Admin Panel</small>
+    </span>
+  </a>
+
+  <nav class="admin-sidebar-nav">
+    <a href="/admin" class="<%= path === '/admin' ? 'active' : '' %>">
+      <span class="admin-nav-icon" aria-hidden="true">🏠</span> Dashboard
+    </a>
+    <a href="/admin/stok/produk" class="<%= path.startsWith('/admin/stok/produk') ? 'active' : '' %>">
+      <span class="admin-nav-icon" aria-hidden="true">📦</span> Produk &amp; Stok
+    </a>
+    <a href="/admin/stok/kategori" class="<%= path.startsWith('/admin/stok/kategori') ? 'active' : '' %>">
+      <span class="admin-nav-icon" aria-hidden="true">🏷️</span> Kategori
+    </a>
+    <a href="/admin/transaksi" class="<%= path.startsWith('/admin/transaksi') ? 'active' : '' %>">
+      <span class="admin-nav-icon" aria-hidden="true">🧾</span> Transaksi
+    </a>
+    <a href="/admin/laporan" class="<%= path.startsWith('/admin/laporan') ? 'active' : '' %>">
+      <span class="admin-nav-icon" aria-hidden="true">📊</span> Laporan
+    </a>
+  </nav>
+
+  <div class="admin-sidebar-footer">
+    <a href="/menu" class="admin-sidebar-link-muted">
+      <span aria-hidden="true">↩</span> Lihat Halaman Pelanggan
+    </a>
+    <div class="admin-sidebar-user">
+      <span class="nav-user-dot" aria-hidden="true"></span>
+      <span><%= user.nama %></span>
+    </div>
+    <form action="/logout" method="POST">
+      <button type="submit" class="admin-logout-btn">Keluar</button>
+    </form>
+  </div>
+</aside>
+
+<script>
+  (() => {
+    const toggle = document.querySelector('[data-sidebar-toggle]');
+    const sidebar = document.querySelector('[data-sidebar]');
+    if (!toggle || !sidebar) return;
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('is-open');
+    });
+    document.addEventListener('click', (e) => {
+      if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        sidebar.classList.remove('is-open');
+      }
+    });
+  })();
+</script>

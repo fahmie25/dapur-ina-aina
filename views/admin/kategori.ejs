@@ -1,0 +1,143 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">🏷️</div>
+  <div>
+    <span class="page-kicker">Kategori</span>
+    <h1>Kelola Kategori</h1>
+    <p class="subtitle">Kategori dipakai untuk mengelompokkan produk pada menu.</p>
+  </div>
+</div>
+
+<div class="toolbar-row">
+  <span class="muted" id="hasil-count"></span>
+  <button type="button" class="btn" data-modal-open="modal-tambah-kategori">+ Tambah Kategori</button>
+</div>
+
+<div class="filter-bar">
+  <div class="field filter-search" style="flex:1;">
+    <label for="f-cari">Cari Nama Kategori</label>
+    <input type="text" id="f-cari" placeholder="Ketik nama kategori..." autocomplete="off" />
+  </div>
+</div>
+
+<% if (kategoriList.length === 0) { %>
+  <div class="empty-state">Belum ada kategori. Klik &quot;+ Tambah Kategori&quot; untuk mulai menambahkan.</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table id="tabel-kategori">
+      <thead><tr><th>Nama Kategori</th><th style="width:220px;">Aksi</th></tr></thead>
+      <tbody>
+        <% kategoriList.forEach(k => { %>
+          <tr data-nama="<%= k.nama_kategori.toLowerCase() %>">
+            <td><%= k.nama_kategori %></td>
+            <td style="white-space:nowrap;">
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                data-modal-open="modal-edit-kategori"
+                data-kategori-id="<%= k.id_kategori %>"
+                data-kategori-nama="<%= k.nama_kategori %>"
+              >Edit</button>
+              <form action="/admin/stok/kategori/<%= k.id_kategori %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('Hapus kategori ini?');">
+                <button type="submit" class="btn btn-chili btn-sm">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <p class="empty-state filter-empty-state" id="filter-empty">Tidak ada kategori yang cocok dengan pencarian.</p>
+  </div>
+<% } %>
+
+<!-- ================= MODAL: TAMBAH KATEGORI ================= -->
+<div class="modal-overlay" id="modal-tambah-kategori" data-modal>
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <h3>Tambah Kategori</h3>
+      <button type="button" class="modal-close-btn" data-modal-close aria-label="Tutup">&times;</button>
+    </div>
+    <form action="/admin/stok/kategori" method="POST">
+      <div class="field">
+        <label>Nama Kategori</label>
+        <input type="text" name="nama_kategori" required />
+      </div>
+      <button type="submit" class="btn btn-block">Tambah Kategori</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= MODAL: EDIT KATEGORI ================= -->
+<div class="modal-overlay" id="modal-edit-kategori" data-modal>
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <h3>Edit Kategori</h3>
+      <button type="button" class="modal-close-btn" data-modal-close aria-label="Tutup">&times;</button>
+    </div>
+    <form id="form-edit-kategori" method="POST">
+      <div class="field">
+        <label>Nama Kategori</label>
+        <input type="text" name="nama_kategori" id="edit-nama-kategori" required />
+      </div>
+      <button type="submit" class="btn btn-block">Simpan Perubahan</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-modal-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const modal = document.getElementById(btn.dataset.modalOpen);
+      if (!modal) return;
+
+      if (btn.dataset.kategoriId) {
+        const form = document.getElementById('form-edit-kategori');
+        form.action = `/admin/stok/kategori/${btn.dataset.kategoriId}?_method=PUT`;
+        document.getElementById('edit-nama-kategori').value = btn.dataset.kategoriNama || '';
+      }
+
+      modal.classList.add('is-open');
+    });
+  });
+  document.querySelectorAll('[data-modal-close]').forEach((btn) => {
+    btn.addEventListener('click', () => btn.closest('[data-modal]').classList.remove('is-open'));
+  });
+  document.querySelectorAll('[data-modal]').forEach((overlay) => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.remove('is-open');
+    });
+  });
+
+  // ---------- Search dengan debounce ----------
+  (() => {
+    const rows = Array.from(document.querySelectorAll('#tabel-kategori tbody tr'));
+    if (rows.length === 0) return;
+
+    const elCari = document.getElementById('f-cari');
+    const elCount = document.getElementById('hasil-count');
+    const elEmpty = document.getElementById('filter-empty');
+
+    function terapkanFilter() {
+      const cari = elCari.value.trim().toLowerCase();
+      let tampil = 0;
+      rows.forEach((row) => {
+        const cocok = !cari || row.dataset.nama.includes(cari);
+        row.style.display = cocok ? '' : 'none';
+        if (cocok) tampil++;
+      });
+      elCount.textContent = `${tampil} dari ${rows.length} kategori`;
+      elEmpty.style.display = tampil === 0 ? 'block' : 'none';
+    }
+
+    let timer;
+    elCari.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(terapkanFilter, 300);
+    });
+
+    terapkanFilter();
+  })();
+</script>
+
+<%- include('../partials/admin-footer') %>

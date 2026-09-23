@@ -1,0 +1,302 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">📦</div>
+  <div>
+    <span class="page-kicker">Stok</span>
+    <h1>Kelola Stok Produk</h1>
+    <p class="subtitle">Cari, filter, tambah, dan perbarui data produk.</p>
+  </div>
+</div>
+
+<div class="toolbar-row">
+  <span class="muted" id="hasil-count"></span>
+  <button type="button" class="btn" data-modal-open="modal-tambah-produk">+ Tambah Produk</button>
+</div>
+
+<!-- ================= FILTER BAR ================= -->
+<div class="filter-bar">
+  <div class="field filter-search">
+    <label for="f-cari">Cari Nama Produk</label>
+    <input type="text" id="f-cari" placeholder="Ketik nama produk..." autocomplete="off" />
+  </div>
+  <div class="field">
+    <label for="f-kategori">Kategori</label>
+    <select id="f-kategori">
+      <option value="">Semua</option>
+      <% kategoriList.forEach(k => { %>
+        <option value="<%= k.id_kategori %>"><%= k.nama_kategori %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-status">Status</label>
+    <select id="f-status">
+      <option value="">Semua</option>
+      <option value="Tersedia">Tersedia</option>
+      <option value="Habis">Habis</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Rentang Harga (Rp)</label>
+    <div class="filter-range">
+      <input type="number" id="f-harga-min" min="0" placeholder="Min" />
+      <span class="muted">–</span>
+      <input type="number" id="f-harga-max" min="0" placeholder="Max" />
+    </div>
+  </div>
+  <div class="field">
+    <label>Rentang Stok</label>
+    <div class="filter-range">
+      <input type="number" id="f-stok-min" min="0" placeholder="Min" />
+      <span class="muted">–</span>
+      <input type="number" id="f-stok-max" min="0" placeholder="Max" />
+    </div>
+  </div>
+  <button type="button" class="btn btn-outline btn-sm filter-bar-reset" id="f-reset">Reset Filter</button>
+</div>
+
+<% if (produkList.length === 0) { %>
+  <div class="empty-state">Belum ada produk. Klik &quot;+ Tambah Produk&quot; untuk mulai menambahkan.</div>
+<% } else { %>
+  <div class="table-wrap">
+    <table id="tabel-produk">
+      <thead>
+        <tr><th>Foto</th><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr>
+      </thead>
+      <tbody>
+        <% produkList.forEach(p => { %>
+          <tr
+            data-nama="<%= p.nama_produk.toLowerCase() %>"
+            data-kategori="<%= p.id_kategori %>"
+            data-status="<%= p.status %>"
+            data-harga="<%= p.harga %>"
+            data-stok="<%= p.stok %>"
+          >
+            <td>
+              <% if (p.gambar_url) { %>
+                <img src="<%= p.gambar_url %>" alt="<%= p.nama_produk %>" class="produk-thumb" />
+              <% } else { %>
+                <span class="produk-thumb produk-thumb-empty" aria-hidden="true">🍽️</span>
+              <% } %>
+            </td>
+            <td><%= p.nama_produk %></td>
+            <td><%= p.kategori?.nama_kategori || '-' %></td>
+            <td>Rp <%= Number(p.harga).toLocaleString('id-ID') %></td>
+            <td><%= p.stok %></td>
+            <td><span class="tag <%= p.status === 'Tersedia' ? 'tersedia' : 'habis' %>"><%= p.status %></span></td>
+            <td style="white-space:nowrap;">
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                data-modal-open="modal-edit-produk"
+                data-produk-id="<%= p.id_produk %>"
+                data-produk-nama="<%= p.nama_produk %>"
+                data-produk-kategori="<%= p.id_kategori %>"
+                data-produk-harga="<%= p.harga %>"
+                data-produk-stok="<%= p.stok %>"
+                data-produk-status="<%= p.status %>"
+                data-produk-gambar="<%= p.gambar_url || '' %>"
+              >Edit</button>
+              <form action="/admin/stok/produk/<%= p.id_produk %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('Hapus produk ini?');">
+                <button type="submit" class="btn btn-chili btn-sm">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <p class="empty-state filter-empty-state" id="filter-empty">Tidak ada produk yang cocok dengan pencarian/filter.</p>
+  </div>
+<% } %>
+
+<!-- ================= MODAL: TAMBAH PRODUK ================= -->
+<div class="modal-overlay" id="modal-tambah-produk" data-modal>
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <h3>Tambah Produk Baru</h3>
+      <button type="button" class="modal-close-btn" data-modal-close aria-label="Tutup">&times;</button>
+    </div>
+    <form action="/admin/stok/produk" method="POST">
+      <div class="field">
+        <label>Nama Produk</label>
+        <input type="text" name="nama_produk" required />
+      </div>
+      <div class="field">
+        <label>Kategori</label>
+        <select name="id_kategori" required>
+          <% kategoriList.forEach(k => { %>
+            <option value="<%= k.id_kategori %>"><%= k.nama_kategori %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Harga (Rp)</label>
+          <input type="number" name="harga" min="0" required />
+        </div>
+        <div class="field">
+          <label>Stok</label>
+          <input type="number" name="stok" min="0" required />
+        </div>
+      </div>
+      <div class="field">
+        <label>Link Foto Produk (opsional)</label>
+        <input type="url" name="gambar_url" placeholder="https://contoh.com/foto-nasi-goreng.jpg" />
+      </div>
+      <button type="submit" class="btn btn-block">Tambah Produk</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= MODAL: EDIT PRODUK ================= -->
+<div class="modal-overlay" id="modal-edit-produk" data-modal>
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <h3>Edit Produk</h3>
+      <button type="button" class="modal-close-btn" data-modal-close aria-label="Tutup">&times;</button>
+    </div>
+    <form id="form-edit-produk" method="POST">
+      <div class="field">
+        <label>Nama Produk</label>
+        <input type="text" name="nama_produk" id="edit-nama" required />
+      </div>
+      <div class="field">
+        <label>Kategori</label>
+        <select name="id_kategori" id="edit-kategori" required>
+          <% kategoriList.forEach(k => { %>
+            <option value="<%= k.id_kategori %>"><%= k.nama_kategori %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Harga (Rp)</label>
+          <input type="number" name="harga" id="edit-harga" min="0" required />
+        </div>
+        <div class="field">
+          <label>Stok</label>
+          <input type="number" name="stok" id="edit-stok" min="0" required />
+        </div>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select name="status" id="edit-status">
+          <option value="Tersedia">Tersedia</option>
+          <option value="Habis">Habis</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Link Foto Produk (opsional)</label>
+        <input type="url" name="gambar_url" id="edit-gambar" placeholder="https://contoh.com/foto-nasi-goreng.jpg" />
+      </div>
+      <button type="submit" class="btn btn-block">Simpan Perubahan</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ---------- Modal open/close ----------
+  document.querySelectorAll('[data-modal-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const modal = document.getElementById(btn.dataset.modalOpen);
+      if (!modal) return;
+
+      // Kalau tombol Edit, isi form modal dengan data produk terkait
+      if (btn.dataset.produkId) {
+        const form = document.getElementById('form-edit-produk');
+        form.action = `/admin/stok/produk/${btn.dataset.produkId}?_method=PUT`;
+        document.getElementById('edit-nama').value = btn.dataset.produkNama || '';
+        document.getElementById('edit-kategori').value = btn.dataset.produkKategori || '';
+        document.getElementById('edit-harga').value = btn.dataset.produkHarga || 0;
+        document.getElementById('edit-stok').value = btn.dataset.produkStok || 0;
+        document.getElementById('edit-status').value = btn.dataset.produkStatus || 'Tersedia';
+        document.getElementById('edit-gambar').value = btn.dataset.produkGambar || '';
+      }
+
+      modal.classList.add('is-open');
+    });
+  });
+  document.querySelectorAll('[data-modal-close]').forEach((btn) => {
+    btn.addEventListener('click', () => btn.closest('[data-modal]').classList.remove('is-open'));
+  });
+  document.querySelectorAll('[data-modal]').forEach((overlay) => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.remove('is-open');
+    });
+  });
+
+  // ---------- Search + filter (client-side, dengan debounce) ----------
+  (() => {
+    const rows = Array.from(document.querySelectorAll('#tabel-produk tbody tr'));
+    if (rows.length === 0) return;
+
+    const elCari = document.getElementById('f-cari');
+    const elKategori = document.getElementById('f-kategori');
+    const elStatus = document.getElementById('f-status');
+    const elHargaMin = document.getElementById('f-harga-min');
+    const elHargaMax = document.getElementById('f-harga-max');
+    const elStokMin = document.getElementById('f-stok-min');
+    const elStokMax = document.getElementById('f-stok-max');
+    const elReset = document.getElementById('f-reset');
+    const elCount = document.getElementById('hasil-count');
+    const elEmpty = document.getElementById('filter-empty');
+
+    function terapkanFilter() {
+      const cari = elCari.value.trim().toLowerCase();
+      const kategori = elKategori.value;
+      const status = elStatus.value;
+      const hargaMin = elHargaMin.value !== '' ? Number(elHargaMin.value) : null;
+      const hargaMax = elHargaMax.value !== '' ? Number(elHargaMax.value) : null;
+      const stokMin = elStokMin.value !== '' ? Number(elStokMin.value) : null;
+      const stokMax = elStokMax.value !== '' ? Number(elStokMax.value) : null;
+
+      let tampil = 0;
+      rows.forEach((row) => {
+        const d = row.dataset;
+        let cocok = true;
+        if (cari && !d.nama.includes(cari)) cocok = false;
+        if (kategori && d.kategori !== kategori) cocok = false;
+        if (status && d.status !== status) cocok = false;
+        if (hargaMin !== null && Number(d.harga) < hargaMin) cocok = false;
+        if (hargaMax !== null && Number(d.harga) > hargaMax) cocok = false;
+        if (stokMin !== null && Number(d.stok) < stokMin) cocok = false;
+        if (stokMax !== null && Number(d.stok) > stokMax) cocok = false;
+
+        row.style.display = cocok ? '' : 'none';
+        if (cocok) tampil++;
+      });
+
+      elCount.textContent = `${tampil} dari ${rows.length} produk`;
+      elEmpty.style.display = tampil === 0 ? 'block' : 'none';
+    }
+
+    // Debounce khusus untuk input teks (search)
+    let timer;
+    elCari.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(terapkanFilter, 300);
+    });
+
+    // Filter dropdown/angka langsung diterapkan (tanpa perlu debounce)
+    [elKategori, elStatus, elHargaMin, elHargaMax, elStokMin, elStokMax].forEach((el) => {
+      el.addEventListener('input', terapkanFilter);
+      el.addEventListener('change', terapkanFilter);
+    });
+
+    elReset.addEventListener('click', () => {
+      elCari.value = '';
+      elKategori.value = '';
+      elStatus.value = '';
+      elHargaMin.value = '';
+      elHargaMax.value = '';
+      elStokMin.value = '';
+      elStokMax.value = '';
+      terapkanFilter();
+    });
+
+    terapkanFilter();
+  })();
+</script>
+
+<%- include('../partials/admin-footer') %>

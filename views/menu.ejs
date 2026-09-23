@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+
+<%
+  const katMap = {};
+  kategoriList.forEach(k => { katMap[k.id_kategori] = k.nama_kategori; });
+  function emojiUntukKategori(nama) {
+    const n = (nama || '').toLowerCase();
+    if (n.includes('utama')) return '🍛';
+    if (n.includes('appetizer') || n.includes('tambahan')) return '🥟';
+    if (n.includes('minuman')) return '🥤';
+    return '🍽️';
+  }
+%>
+
+<div class="page-header">
+  <span class="page-kicker">Menu Hari Ini</span>
+  <h1>Apa yang ingin Anda santap?</h1>
+  <p class="subtitle">Pilih menu, atur jumlah, tambahkan ke keranjang, lalu lakukan pembayaran. Tidak perlu login.</p>
+</div>
+
+<div class="pill-row">
+  <a class="pill <%= !selectedKategori ? 'active' : '' %>" href="/menu">Semua</a>
+  <% kategoriList.forEach(k => { %>
+    <a class="pill <%= selectedKategori === k.id_kategori ? 'active' : '' %>" href="/menu?kategori=<%= k.id_kategori %>"><%= k.nama_kategori %></a>
+  <% }) %>
+</div>
+
+<% if (produkList.length === 0) { %>
+  <div class="empty-state">Belum ada produk pada kategori ini.</div>
+<% } else { %>
+  <div class="grid">
+    <% produkList.forEach(p => { %>
+      <div class="card menu-card">
+        <div class="menu-card-media">
+          <% if (p.gambar_url) { %>
+            <img src="<%= p.gambar_url %>" alt="<%= p.nama_produk %>" />
+          <% } else { %>
+            <span aria-hidden="true"><%= emojiUntukKategori(katMap[p.id_kategori]) %></span>
+          <% } %>
+          <span class="tag <%= p.status === 'Tersedia' ? 'tersedia' : 'habis' %>"><%= p.status %></span>
+        </div>
+        <div class="menu-card-body">
+          <div class="menu-card-cat"><%= katMap[p.id_kategori] || '-' %></div>
+          <h3><%= p.nama_produk %></h3>
+          <p class="price">Rp <%= Number(p.harga).toLocaleString('id-ID') %></p>
+          <p class="menu-card-stock">Stok: <%= p.stok %></p>
+          <form action="/cart/add" method="POST" class="menu-card-footer">
+            <input type="hidden" name="id_produk" value="<%= p.id_produk %>" />
+            <div class="field">
+              <label>Jumlah</label>
+              <input type="number" name="jumlah" value="1" min="1" max="<%= p.stok %>" <%= p.status !== 'Tersedia' ? 'disabled' : '' %> />
+            </div>
+            <button type="submit" class="btn btn-sm" <%= p.status !== 'Tersedia' ? 'disabled' : '' %>>
+              <%= p.status === 'Tersedia' ? 'Tambah' : 'Habis' %>
+            </button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

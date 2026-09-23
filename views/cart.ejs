@@ -1,0 +1,50 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <span class="page-kicker">Keranjang</span>
+  <h1>Periksa Pesanan Anda</h1>
+  <p class="subtitle">Pastikan jumlah sudah sesuai sebelum lanjut ke checkout.</p>
+</div>
+
+<% if (cart.length === 0) { %>
+  <div class="empty-state">
+    Keranjang masih kosong. <a href="/menu">Lihat menu</a> untuk mulai memesan.
+  </div>
+<% } else { %>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Subtotal</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% cart.forEach(item => { %>
+          <tr>
+            <td class="cart-product"><%= item.nama_produk %></td>
+            <td>Rp <%= item.harga.toLocaleString('id-ID') %></td>
+            <td>
+              <form action="/cart/update" method="POST" class="qty-form">
+                <input type="hidden" name="id_produk" value="<%= item.id_produk %>" />
+                <input type="number" name="jumlah" value="<%= item.jumlah %>" min="0" />
+                <button type="submit" class="btn btn-outline btn-sm">Ubah</button>
+              </form>
+            </td>
+            <td><strong>Rp <%= (item.harga * item.jumlah).toLocaleString('id-ID') %></strong></td>
+            <td>
+              <form action="/cart/remove" method="POST">
+                <input type="hidden" name="id_produk" value="<%= item.id_produk %>" />
+                <button type="submit" class="btn btn-chili btn-sm">Hapus</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cart-summary-bar">
+    <h2>Total: Rp <%= total.toLocaleString('id-ID') %></h2>
+    <a href="/checkout" class="btn">Lanjut ke Checkout →</a>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %>

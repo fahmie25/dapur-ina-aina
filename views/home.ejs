@@ -1,0 +1,88 @@
+<%- include('partials/header') %>
+
+<section class="home-hero">
+  <div class="home-hero-copy">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> Masakan rumahan · Tanpa login</div>
+    <h1>Rasa rumahan yang bikin <span>ingin kembali.</span></h1>
+    <p class="hero-lead">Pilih makanan favoritmu, atur pesanan, lanjutkan pembayaran, lalu simpan billing dalam satu alur yang sederhana.</p>
+    <div class="hero-actions">
+      <a href="/menu" class="btn btn-hero">Lihat Menu <span aria-hidden="true">→</span></a>
+      <a href="#cara-pesan" class="btn btn-outline btn-hero-secondary">Cara Memesan</a>
+    </div>
+    <div class="hero-trust-row">
+      <div><strong>3</strong><span>Kategori menu</span></div>
+      <div><strong>1</strong><span>Alur pemesanan</span></div>
+      <div><strong>0</strong><span>Akun pelanggan</span></div>
+    </div>
+  </div>
+
+  <div class="home-hero-art" aria-label="Ilustrasi meja makan Dapur Ina Aina">
+    <div class="art-glow art-glow-one"></div>
+    <div class="art-glow art-glow-two"></div>
+    <div class="food-card food-card-main">
+      <div class="food-card-topline"><span>Menu pilihan hari ini</span><span class="food-status">Tersedia</span></div>
+      <div class="food-plate" aria-hidden="true"><span>🍛</span></div>
+      <div class="food-copy">
+        <strong>Nasi Nusantara</strong>
+        <span>Hangat · gurih · dibuat segar</span>
+      </div>
+      <div class="food-price-row"><strong>Rp 25.000</strong><span>★ 4.9</span></div>
+    </div>
+    <div class="floating-note note-one"><span>🛒</span><div><strong>Pesan mudah</strong><small>Tanpa akun pelanggan</small></div></div>
+    <div class="floating-note note-two"><span>🧾</span><div><strong>Billing otomatis</strong><small>Siap setelah pesanan</small></div></div>
+  </div>
+</section>
+
+<section class="section-block">
+  <div class="section-heading">
+    <div>
+      <span class="section-kicker">Pilih sesuai selera</span>
+      <h2>Kategori favorit</h2>
+    </div>
+    <a href="/menu" class="section-link">Lihat semua menu <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="category-grid">
+    <a href="/menu" class="category-card category-main">
+      <span class="category-icon" aria-hidden="true">🍛</span>
+      <div><span class="category-label">01</span><h3>Makanan Utama</h3><p>Menu hangat untuk makan sampai puas.</p></div>
+      <span class="category-arrow" aria-hidden="true">↗</span>
+    </a>
+    <a href="/menu" class="category-card category-appetizer">
+      <span class="category-icon" aria-hidden="true">🥟</span>
+      <div><span class="category-label">02</span><h3>Appetizer</h3><p>Camilan pembuka sebelum menu utama.</p></div>
+      <span class="category-arrow" aria-hidden="true">↗</span>
+    </a>
+    <a href="/menu" class="category-card category-drink">
+      <span class="category-icon" aria-hidden="true">🥤</span>
+      <div><span class="category-label">03</span><h3>Minuman</h3><p>Teman terbaik untuk setiap sajian.</p></div>
+      <span class="category-arrow" aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>
+
+<section class="process-section" id="cara-pesan">
+  <div class="process-intro">
+    <span class="section-kicker">Cara pesan</span>
+    <h2>Dari pilih menu sampai billing, semuanya jelas.</h2>
+    <p>Tidak perlu membuat akun. Cukup pilih menu, isi data pemesanan, lalu lanjutkan ke pembayaran.</p>
+    <a href="/menu" class="text-link">Mulai pesan sekarang <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="process-list">
+    <div class="process-item"><span>01</span><div><strong>Pilih menu</strong><p>Temukan makanan atau minuman yang kamu inginkan.</p></div></div>
+    <div class="process-item"><span>02</span><div><strong>Atur keranjang</strong><p>Sesuaikan jumlah sebelum lanjut ke checkout.</p></div></div>
+    <div class="process-item"><span>03</span><div><strong>Checkout &amp; bayar</strong><p>Isi data pelanggan lalu pilih metode pembayaran.</p></div></div>
+    <div class="process-item"><span>04</span><div><strong>Simpan billing</strong><p>Pesanan selesai dan billing bisa langsung dicetak.</p></div></div>
+  </div>
+</section>
+
+<section class="home-cta">
+  <div>
+    <span class="section-kicker">Sudah siap?</span>
+    <h2>Pesanan enak dimulai dari satu klik.</h2>
+    <p>Buka menu dan pilih makanan yang paling kamu suka.</p>
+  </div>
+  <a href="/menu" class="btn btn-hero">Mulai Pesan <span aria-hidden="true">→</span></a>
+</section>
+
+<%- include('partials/footer') %>

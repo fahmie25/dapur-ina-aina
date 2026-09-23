@@ -1,0 +1,24 @@
+<%- include('../partials/admin-header') %>
+
+<div class="page-header admin-page-header">
+  <div class="admin-page-icon" aria-hidden="true">✏️</div>
+  <div>
+    <span class="page-kicker">Edit Kategori</span>
+    <h1><%= kategori.nama_kategori %></h1>
+  </div>
+</div>
+
+<div class="card" style="max-width:420px;">
+  <form action="/admin/stok/kategori/<%= kategori.id_kategori %>?_method=PUT" method="POST">
+    <div class="field">
+      <label>Nama Kategori</label>
+      <input type="text" name="nama_kategori" value="<%= kategori.nama_kategori %>" required />
+    </div>
+    <div class="flex-between">
+      <a href="/admin/stok/kategori" class="btn btn-outline">Batal</a>
+      <button type="submit" class="btn">Simpan</button>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/admin-footer') %>
