@@ -1,57 +1,92 @@
 <%- include('../partials/admin-header') %>
 
-<div class="page-header admin-page-header">
-  <div class="admin-page-icon" aria-hidden="true">🧾</div>
+<%
+  const bayar = pesanan.pembayaran?.[0] || null;
+  const statusFinal = ['Selesai', 'Dibatalkan'].includes(pesanan.status);
+  const kodePesanan = 'DIA-' + String(pesanan.id_pesanan).padStart(6, '0');
+  const labelBayar = { Berhasil: 'Lunas', Pending: 'Belum Dibayar', Gagal: 'Gagal', Kadaluarsa: 'Kadaluarsa' };
+  const kelasBayar = bayar ? bayar.status.toLowerCase() : 'pending';
+%>
+
+<div class="txn-detail-header">
   <div>
-    <span class="page-kicker">Detail Transaksi</span>
-    <h1>Pesanan #<%= pesanan.id_pesanan %></h1>
-    <p class="subtitle">Pelanggan: <strong><%= pesanan.nama_pelanggan || pesanan.users?.nama || '-' %></strong> · WhatsApp: <%= pesanan.no_telp || '-' %></p>
+    <h1 class="txn-code"><%= kodePesanan %></h1>
+    <p class="muted mb-0"><%= new Date(pesanan.tanggal).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
   </div>
-</div>
-
-<div class="receipt" style="margin-bottom:28px;">
-  <% pesanan.detail_pesanan.forEach(d => { %>
-    <div class="receipt-row">
-      <span><%= d.produk?.nama_produk %> &times; <%= d.jumlah %></span>
-      <span>Rp <%= Number(d.subtotal).toLocaleString('id-ID') %></span>
-    </div>
-  <% }) %>
-  <div class="receipt-row receipt-total">
-    <span>Total</span>
-    <span>Rp <%= Number(pesanan.total).toLocaleString('id-ID') %></span>
-  </div>
-</div>
-
-<div class="grid" style="grid-template-columns: 1fr 1fr; max-width:700px;">
-  <div class="card">
-    <h3>Ubah Status Pesanan</h3>
-    <form action="/admin/transaksi/<%= pesanan.id_pesanan %>/status?_method=PUT" method="POST">
-      <div class="field">
-        <label>Status</label>
-        <select name="status">
-          <% ['Menunggu Pembayaran','Dibayar','Diproses','Selesai','Dibatalkan'].forEach(s => { %>
-            <option value="<%= s %>" <%= pesanan.status === s ? 'selected' : '' %>><%= s %></option>
-          <% }) %>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-block">Simpan Perubahan</button>
-    </form>
-  </div>
-
-  <div class="card">
-    <h3>Pembayaran</h3>
-    <% const bayar = pesanan.pembayaran?.[0]; %>
+  <div class="txn-badges">
+    <span class="status status-<%= pesanan.status.toLowerCase().replace(/ /g, '-') %>"><%= pesanan.status %></span>
     <% if (bayar) { %>
-      <p class="muted" style="margin-bottom:6px;">Metode: <%= bayar.metode || '-' %></p>
-      <p class="muted" style="margin-bottom:14px;">Status: <span class="status status-<%= bayar.status.toLowerCase() %>"><%= bayar.status %></span></p>
-      <% if (bayar.metode === 'Tunai' && bayar.status === 'Pending') { %>
-        <form action="/admin/transaksi/<%= pesanan.id_pesanan %>/konfirmasi-tunai?_method=PUT" method="POST">
-          <button type="submit" class="btn btn-chili btn-block">Konfirmasi Pembayaran Tunai</button>
+      <span class="status status-<%= kelasBayar %>"><%= labelBayar[bayar.status] || bayar.status %></span>
+    <% } %>
+  </div>
+</div>
+
+<div class="txn-detail-grid">
+  <div class="txn-detail-main">
+    <div class="card">
+      <h3>Pelanggan</h3>
+      <p class="mb-0"><strong><%= pesanan.nama_pelanggan || pesanan.users?.nama || '-' %></strong></p>
+      <p class="muted">No. WhatsApp: <%= pesanan.no_telp || '-' %></p>
+      <p class="muted mb-0">Metode pembayaran: <%= bayar?.metode || '-' %></p>
+    </div>
+
+    <div class="card">
+      <h3>Rincian Pesanan</h3>
+      <div class="receipt receipt-flat">
+        <% pesanan.detail_pesanan.forEach(d => { %>
+          <div class="receipt-row receipt-row-item">
+            <span>
+              <%= d.produk?.nama_produk %>
+              <small class="muted d-block"><%= d.jumlah %> &times; Rp <%= Number(d.harga).toLocaleString('id-ID') %></small>
+            </span>
+            <span>Rp <%= Number(d.subtotal).toLocaleString('id-ID') %></span>
+          </div>
+        <% }) %>
+        <div class="receipt-row receipt-total">
+          <span>Total</span>
+          <span>Rp <%= Number(pesanan.total).toLocaleString('id-ID') %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="txn-detail-side">
+    <div class="card">
+      <h3>Kelola Transaksi</h3>
+
+      <% if (statusFinal) { %>
+        <p class="muted mb-0">Pesanan ini sudah final dan tidak dapat diubah.</p>
+      <% } else { %>
+        <form action="/admin/transaksi/<%= pesanan.id_pesanan %>/status?_method=PUT" method="POST" style="margin-bottom:20px;">
+          <div class="field">
+            <label>Status Pesanan</label>
+            <select name="status">
+              <% ['Menunggu Pembayaran','Dibayar','Diproses','Selesai','Dibatalkan'].forEach(s => { %>
+                <option value="<%= s %>" <%= pesanan.status === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-block btn-sm">Simpan Status</button>
         </form>
       <% } %>
-    <% } else { %>
-      <p class="muted">Belum ada data pembayaran.</p>
-    <% } %>
+
+      <% if (bayar) { %>
+        <div class="txn-payment-block">
+          <h4>Pembayaran</h4>
+          <div class="payment-segment">
+            <% if (bayar.metode === 'Tunai' && bayar.status === 'Pending') { %>
+              <form action="/admin/transaksi/<%= pesanan.id_pesanan %>/konfirmasi-tunai?_method=PUT" method="POST">
+                <button type="submit" class="btn-segment is-active">Tandai Lunas</button>
+              </form>
+            <% } else { %>
+              <span class="btn-segment <%= bayar.status === 'Berhasil' ? 'is-active' : '' %>">Tandai Lunas</span>
+            <% } %>
+            <span class="btn-segment <%= bayar.status === 'Pending' ? 'is-active-muted' : '' %>">Belum Dibayar</span>
+            <span class="btn-segment <%= ['Gagal', 'Kadaluarsa'].includes(bayar.status) ? 'is-active-danger' : '' %>">Gagal</span>
+          </div>
+        </div>
+      <% } %>
+    </div>
   </div>
 </div>
 
