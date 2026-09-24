@@ -40,9 +40,9 @@
   <div class="field">
     <label>Rentang Harga (Rp)</label>
     <div class="filter-range">
-      <input type="number" id="f-harga-min" min="0" placeholder="Min" />
+      <input type="text" inputmode="numeric" id="f-harga-min" class="input-rupiah" placeholder="Min" />
       <span class="muted">–</span>
-      <input type="number" id="f-harga-max" min="0" placeholder="Max" />
+      <input type="text" inputmode="numeric" id="f-harga-max" class="input-rupiah" placeholder="Max" />
     </div>
   </div>
   <div class="field">
@@ -133,7 +133,7 @@
       <div class="form-row">
         <div class="field">
           <label>Harga (Rp)</label>
-          <input type="number" name="harga" min="0" required />
+          <input type="text" inputmode="numeric" name="harga" class="input-rupiah" placeholder="0" required />
         </div>
         <div class="field">
           <label>Stok</label>
@@ -172,7 +172,7 @@
       <div class="form-row">
         <div class="field">
           <label>Harga (Rp)</label>
-          <input type="number" name="harga" id="edit-harga" min="0" required />
+          <input type="text" inputmode="numeric" name="harga" id="edit-harga" class="input-rupiah" placeholder="0" required />
         </div>
         <div class="field">
           <label>Stok</label>
@@ -208,7 +208,7 @@
         form.action = `/admin/stok/produk/${btn.dataset.produkId}?_method=PUT`;
         document.getElementById('edit-nama').value = btn.dataset.produkNama || '';
         document.getElementById('edit-kategori').value = btn.dataset.produkKategori || '';
-        document.getElementById('edit-harga').value = btn.dataset.produkHarga || 0;
+        document.getElementById('edit-harga').value = Number(btn.dataset.produkHarga || 0).toLocaleString('id-ID');
         document.getElementById('edit-stok').value = btn.dataset.produkStok || 0;
         document.getElementById('edit-status').value = btn.dataset.produkStatus || 'Tersedia';
         document.getElementById('edit-gambar').value = btn.dataset.produkGambar || '';
@@ -246,8 +246,8 @@
       const cari = elCari.value.trim().toLowerCase();
       const kategori = elKategori.value;
       const status = elStatus.value;
-      const hargaMin = elHargaMin.value !== '' ? Number(elHargaMin.value) : null;
-      const hargaMax = elHargaMax.value !== '' ? Number(elHargaMax.value) : null;
+      const hargaMin = elHargaMin.value !== '' ? Number(elHargaMin.value.replace(/\D/g, '')) : null;
+      const hargaMax = elHargaMax.value !== '' ? Number(elHargaMax.value.replace(/\D/g, '')) : null;
       const stokMin = elStokMin.value !== '' ? Number(elStokMin.value) : null;
       const stokMax = elStokMax.value !== '' ? Number(elStokMax.value) : null;
 

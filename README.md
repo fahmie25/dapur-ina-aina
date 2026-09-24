@@ -122,7 +122,23 @@ jalankan `sql/migration_gambar_produk.sql` di SQL Editor Supabase untuk
 menambahkan kolom `gambar_url` ke tabel `produk` (project baru cukup
 jalankan `sql/schema.sql` seperti biasa, sudah termasuk di dalamnya).
 
-## 8. Batasan yang Perlu Diketahui
+## 8. Fitur Tambahan Terbaru
+
+- **Format input harga otomatis**: semua kolom yang berfungsi sebagai harga
+  (harga produk, jumlah bayar tunai, filter rentang harga) otomatis
+  menampilkan pemisah ribuan saat diketik (`1000` → `1.000`). Dijalankan oleh
+  `public/js/format-rupiah.js` lewat class `input-rupiah`; nilai otomatis
+  dikembalikan ke angka polos sebelum form dikirim ke server, jadi tidak ada
+  perubahan pada cara server memproses data.
+- **Validasi nomor telepon saat checkout**: kolom nomor WhatsApp/telepon
+  pelanggan divalidasi format nomor Indonesia (`08xxxxxxxxxx` atau
+  `+62xxxxxxxxxx`) secara langsung saat mengetik, dengan pesan umpan balik.
+- **Export PDF Laporan Penjualan**: tombol "⬇ Export PDF" di halaman
+  `/admin/laporan` mengunduh laporan periode yang sedang ditampilkan
+  (mingguan/bulanan/tahunan, sesuai tanggal yang dipilih) sebagai file PDF.
+  Fitur ini memakai library `pdfkit` (sudah ditambahkan ke `package.json`).
+
+## 9. Batasan yang Perlu Diketahui
 
 - Karena project ini dibangun di lingkungan sandbox tanpa akses internet,
   `node_modules` **belum ter-install** — jalankan `npm install` di komputer

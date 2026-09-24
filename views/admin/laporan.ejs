@@ -9,10 +9,17 @@
   </div>
 </div>
 
-<div class="pill-row">
-  <a class="pill <%= periode === 'mingguan' ? 'active' : '' %>" href="/admin/laporan?periode=mingguan">Mingguan</a>
-  <a class="pill <%= periode === 'bulanan' ? 'active' : '' %>" href="/admin/laporan?periode=bulanan">Bulanan</a>
-  <a class="pill <%= periode === 'tahunan' ? 'active' : '' %>" href="/admin/laporan?periode=tahunan">Tahunan</a>
+<div class="toolbar-row">
+  <div class="pill-row" style="margin-bottom:0;">
+    <a class="pill <%= periode === 'mingguan' ? 'active' : '' %>" href="/admin/laporan?periode=mingguan">Mingguan</a>
+    <a class="pill <%= periode === 'bulanan' ? 'active' : '' %>" href="/admin/laporan?periode=bulanan">Bulanan</a>
+    <a class="pill <%= periode === 'tahunan' ? 'active' : '' %>" href="/admin/laporan?periode=tahunan">Tahunan</a>
+  </div>
+  <%
+    const paramPeriode = periode === 'mingguan' ? 'tanggal' : periode === 'tahunan' ? 'tahun' : 'bulan';
+    const urlExportPdf = `/admin/laporan/export-pdf?periode=${periode}&${paramPeriode}=${encodeURIComponent(pivotValue)}`;
+  %>
+  <a href="<%= urlExportPdf %>" class="btn btn-outline btn-sm">⬇ Export PDF</a>
 </div>
 
 <form action="/admin/laporan" method="GET" class="filter-bar">

@@ -2,27 +2,6 @@
     </main>
   </div>
 </div>
-
-<script>
-  (() => {
-    const btn = document.getElementById('admin-theme-toggle');
-    const icon = document.getElementById('admin-theme-icon');
-    if (!btn) return;
-
-    function terapkan(gelap) {
-      document.documentElement.setAttribute('data-admin-theme', gelap ? 'dark' : 'light');
-      if (icon) icon.textContent = gelap ? '☀️' : '🌙';
-    }
-
-    terapkan(document.documentElement.getAttribute('data-admin-theme') === 'dark');
-
-    btn.addEventListener('click', () => {
-      const gelapSaatIni = document.documentElement.getAttribute('data-admin-theme') === 'dark';
-      const gelapBaru = !gelapSaatIni;
-      terapkan(gelapBaru);
-      try { localStorage.setItem('admin-theme', gelapBaru ? 'dark' : 'light'); } catch (e) {}
-    });
-  })();
-</script>
+<script src="/js/format-rupiah.js"></script>
 </body>
 </html>

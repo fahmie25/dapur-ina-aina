@@ -32,7 +32,8 @@
     <form action="/payment/<%= pesanan.id_pesanan %>/tunai" method="POST">
       <div class="field">
         <label for="jumlah_bayar">Jumlah Dibayarkan</label>
-        <input type="number" id="jumlah_bayar" name="jumlah_bayar" min="<%= Math.round(Number(pesanan.total)) %>" step="500" required />
+        <input type="text" inputmode="numeric" id="jumlah_bayar" name="jumlah_bayar" class="input-rupiah" placeholder="0" required />
+        <p class="muted" style="font-size:.78rem; margin:6px 0 0;">Minimal Rp <%= Math.round(Number(pesanan.total)).toLocaleString('id-ID') %></p>
       </div>
       <button type="submit" class="btn btn-outline btn-block">Catat Pembayaran Tunai</button>
     </form>

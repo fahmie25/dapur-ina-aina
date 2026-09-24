@@ -16,7 +16,17 @@
       </div>
       <div class="field">
         <label for="no_telp">Nomor WhatsApp / Telepon</label>
-        <input type="tel" id="no_telp" name="no_telp" maxlength="20" required placeholder="08xxxxxxxxxx" />
+        <input
+          type="tel"
+          id="no_telp"
+          name="no_telp"
+          maxlength="16"
+          required
+          placeholder="08xxxxxxxxxx"
+          pattern="^(0|\+62)8[0-9]{8,12}$"
+          title="Gunakan format nomor Indonesia, contoh: 081234567890 atau +6281234567890"
+        />
+        <p id="no-telp-feedback" class="muted" style="font-size:.78rem; margin:6px 0 0;">Contoh: 081234567890</p>
       </div>
       <button type="submit" class="btn btn-block">Buat Pesanan &amp; Lanjut Pembayaran</button>
     </form>
@@ -38,5 +48,48 @@
     </div>
   </div>
 </div>
+
+<script>
+  (() => {
+    const input = document.getElementById('no_telp');
+    const feedback = document.getElementById('no-telp-feedback');
+    if (!input) return;
+
+    const polaValid = /^(0|\+62)8[0-9]{8,12}$/;
+
+    function cekValiditas() {
+      const nilai = input.value.trim();
+      if (!nilai) {
+        feedback.textContent = 'Contoh: 081234567890';
+        feedback.style.color = '';
+        input.style.borderColor = '';
+        return;
+      }
+      if (polaValid.test(nilai)) {
+        feedback.textContent = '✓ Format nomor valid';
+        feedback.style.color = 'var(--leaf)';
+        input.style.borderColor = 'var(--leaf)';
+      } else {
+        feedback.textContent = 'Format belum sesuai. Gunakan awalan 08 atau +62, contoh: 081234567890';
+        feedback.style.color = 'var(--chili)';
+        input.style.borderColor = 'var(--chili)';
+      }
+    }
+
+    // Hanya izinkan digit dan tanda + di awal saat mengetik
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+      cekValiditas();
+    });
+
+    input.closest('form').addEventListener('submit', (e) => {
+      if (!polaValid.test(input.value.trim())) {
+        e.preventDefault();
+        cekValiditas();
+        input.focus();
+      }
+    });
+  })();
+</script>
 
 <%- include('partials/footer') %>

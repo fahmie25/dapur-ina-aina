@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const PDFDocument = require('pdfkit');
 const { supabaseAdmin } = require('../config/supabase');
 const { requireRole } = require('../middleware/auth');
 
@@ -56,27 +57,36 @@ function hitungRentang(periode, query) {
   };
 }
 
+// Ambil data transaksi untuk suatu periode. Dipakai bersama oleh halaman
+// laporan (render HTML) dan endpoint export PDF, supaya keduanya selalu
+// menampilkan angka yang identik.
+async function ambilDataLaporan(req) {
+  const periode = ['mingguan', 'bulanan', 'tahunan'].includes(req.query.periode)
+    ? req.query.periode
+    : 'bulanan';
+  const rentang = hitungRentang(periode, req.query);
+
+  const { data: transaksiList, error } = await supabaseAdmin
+    .from('pesanan')
+    .select('id_pesanan, tanggal, total, status, nama_pelanggan, users(nama)')
+    .gte('tanggal', rentang.start.toISOString())
+    .lte('tanggal', rentang.end.toISOString())
+    .in('status', ['Dibayar', 'Diproses', 'Selesai'])
+    .order('tanggal', { ascending: false });
+  if (error) throw error;
+
+  const dataAda = transaksiList.length > 0;
+  const totalPenjualan = transaksiList.reduce((sum, t) => sum + Number(t.total), 0);
+  const jumlahTransaksi = transaksiList.length;
+
+  return { periode, rentang, transaksiList, dataAda, totalPenjualan, jumlahTransaksi };
+}
+
 // GET /admin/laporan : "Buka menu laporan" -> "Tampilkan filter periode" -> "Ambil data transaksi"
 router.get('/', async (req, res, next) => {
   try {
-    const periode = ['mingguan', 'bulanan', 'tahunan'].includes(req.query.periode)
-      ? req.query.periode
-      : 'bulanan';
-    const rentang = hitungRentang(periode, req.query);
-
-    const { data: transaksiList, error } = await supabaseAdmin
-      .from('pesanan')
-      .select('id_pesanan, tanggal, total, status, nama_pelanggan, users(nama)')
-      .gte('tanggal', rentang.start.toISOString())
-      .lte('tanggal', rentang.end.toISOString())
-      .in('status', ['Dibayar', 'Diproses', 'Selesai'])
-      .order('tanggal', { ascending: false });
-    if (error) throw error;
-
-    // "Data ada?" -> ya: Tampilkan laporan | tidak: ganti periode
-    const dataAda = transaksiList.length > 0;
-    const totalPenjualan = transaksiList.reduce((sum, t) => sum + Number(t.total), 0);
-    const jumlahTransaksi = transaksiList.length;
+    const { periode, rentang, transaksiList, dataAda, totalPenjualan, jumlahTransaksi } =
+      await ambilDataLaporan(req);
 
     res.render('admin/laporan', {
       title: 'Laporan Penjualan',
@@ -88,6 +98,81 @@ router.get('/', async (req, res, next) => {
       totalPenjualan,
       jumlahTransaksi,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /admin/laporan/export-pdf : unduh laporan periode yang sedang dilihat sebagai PDF
+router.get('/export-pdf', async (req, res, next) => {
+  try {
+    const { periode, rentang, transaksiList, totalPenjualan, jumlahTransaksi } =
+      await ambilDataLaporan(req);
+
+    const namaFile = `laporan-penjualan-${periode}-${toDateInputValue(new Date())}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${namaFile}"`);
+
+    const doc = new PDFDocument({ size: 'A4', margin: 44 });
+    doc.pipe(res);
+
+    // ---------- Kop laporan ----------
+    doc.fontSize(18).fillColor('#2F4B3C').text('Dapur Ina Aina', { continued: false });
+    doc.fontSize(13).fillColor('#241C15').text('Laporan Penjualan');
+    doc.fontSize(10).fillColor('#7C7060').text(`Periode: ${rentang.label}`);
+    doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`);
+    doc.moveDown(1);
+
+    // ---------- Ringkasan ----------
+    doc.fontSize(11).fillColor('#241C15');
+    doc.text(`Total Penjualan  : Rp ${totalPenjualan.toLocaleString('id-ID')}`);
+    doc.text(`Jumlah Transaksi : ${jumlahTransaksi}`);
+    if (jumlahTransaksi > 0) {
+      doc.text(`Rata-rata/Transaksi : Rp ${Math.round(totalPenjualan / jumlahTransaksi).toLocaleString('id-ID')}`);
+    }
+    doc.moveDown(1);
+
+    if (transaksiList.length === 0) {
+      doc.fontSize(11).fillColor('#7C7060').text('Tidak ada data transaksi pada periode ini.');
+      doc.end();
+      return;
+    }
+
+    // ---------- Tabel transaksi ----------
+    const kolom = { no: 44, pelanggan: 110, tanggal: 280, total: 400, status: 480 };
+    const lebarHalaman = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+    function gambarHeaderTabel() {
+      const y = doc.y;
+      doc.fontSize(9).fillColor('#7C7060');
+      doc.text('No.', kolom.no, y, { width: kolom.pelanggan - kolom.no - 6 });
+      doc.text('Pelanggan', kolom.pelanggan, y, { width: kolom.tanggal - kolom.pelanggan - 6 });
+      doc.text('Tanggal', kolom.tanggal, y, { width: kolom.total - kolom.tanggal - 6 });
+      doc.text('Total', kolom.total, y, { width: kolom.status - kolom.total - 6 });
+      doc.text('Status', kolom.status, y, { width: doc.page.margins.left + lebarHalaman - kolom.status });
+      doc.moveDown(0.4);
+      doc.moveTo(doc.page.margins.left, doc.y).lineTo(doc.page.margins.left + lebarHalaman, doc.y).strokeColor('#E4D9C3').stroke();
+      doc.moveDown(0.4);
+    }
+
+    gambarHeaderTabel();
+
+    transaksiList.forEach((t) => {
+      if (doc.y > doc.page.height - doc.page.margins.bottom - 40) {
+        doc.addPage();
+        gambarHeaderTabel();
+      }
+      const y = doc.y;
+      doc.fontSize(9).fillColor('#241C15');
+      doc.text(`#${t.id_pesanan}`, kolom.no, y, { width: kolom.pelanggan - kolom.no - 6 });
+      doc.text(t.nama_pelanggan || t.users?.nama || '-', kolom.pelanggan, y, { width: kolom.tanggal - kolom.pelanggan - 6 });
+      doc.text(new Date(t.tanggal).toLocaleDateString('id-ID'), kolom.tanggal, y, { width: kolom.total - kolom.tanggal - 6 });
+      doc.text(`Rp ${Number(t.total).toLocaleString('id-ID')}`, kolom.total, y, { width: kolom.status - kolom.total - 6 });
+      doc.text(t.status, kolom.status, y, { width: doc.page.margins.left + lebarHalaman - kolom.status });
+      doc.moveDown(0.6);
+    });
+
+    doc.end();
   } catch (err) {
     next(err);
   }

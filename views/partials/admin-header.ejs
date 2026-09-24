@@ -5,16 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= typeof title !== 'undefined' ? title + ' · Admin Dapur Ina Aina' : 'Admin Dapur Ina Aina' %></title>
   <link rel="stylesheet" href="/css/style.css" />
-  <script>
-    // Terapkan preferensi mode gelap panel admin sedini mungkin (hindari kedipan)
-    (function () {
-      try {
-        if (localStorage.getItem('admin-theme') === 'dark') {
-          document.documentElement.setAttribute('data-admin-theme', 'dark');
-        }
-      } catch (e) {}
-    })();
-  </script>
 </head>
 <body class="admin-body">
 <div class="admin-layout">
@@ -22,19 +12,8 @@
 
   <div class="admin-main-col">
     <div class="admin-topbar">
-      <div class="admin-topbar-left">
-        <button class="admin-sidebar-toggle" type="button" aria-label="Buka menu" data-sidebar-toggle>☰</button>
-        <span class="admin-topbar-title"><%= typeof title !== 'undefined' ? title : 'Admin' %></span>
-      </div>
-      <div class="admin-topbar-right">
-        <button type="button" class="theme-toggle-btn" id="admin-theme-toggle" aria-label="Ganti mode gelap/terang" title="Mode gelap/terang">
-          <span id="admin-theme-icon">🌙</span>
-        </button>
-        <div class="topbar-user">
-          <span class="topbar-avatar" aria-hidden="true"><%= (user.nama || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() %></span>
-          <span class="topbar-user-name"><%= user.nama %></span>
-        </div>
-      </div>
+      <button class="admin-sidebar-toggle" type="button" aria-label="Buka menu" data-sidebar-toggle>☰</button>
+      <span class="admin-topbar-title"><%= typeof title !== 'undefined' ? title : 'Admin' %></span>
     </div>
 
     <main class="admin-main">

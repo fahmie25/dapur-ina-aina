@@ -34,6 +34,12 @@ router.post('/checkout/place', async (req, res, next) => {
     return res.redirect('/checkout');
   }
 
+  const polaNoTelp = /^(0|\+62)8[0-9]{8,12}$/;
+  if (!polaNoTelp.test(noTelp)) {
+    req.flash('error', 'Format nomor WhatsApp/telepon tidak valid. Gunakan awalan 08 atau +62, contoh: 081234567890.');
+    return res.redirect('/checkout');
+  }
+
   try {
     // Re-validasi stok sebelum transaksi disimpan.
     for (const item of cart) {

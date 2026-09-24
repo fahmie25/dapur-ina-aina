@@ -622,6 +622,12 @@ footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--ink-mu
   .home-cta .btn-hero { width: 100%; justify-content: center; }
 }
 
+.dashboard-stats { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; }
+.stat-wide { grid-column:span 2; }
+.dashboard-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:24px; }
+@media (max-width:900px) { .dashboard-stats { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:560px) { .dashboard-stats { grid-template-columns:1fr; } .stat-wide { grid-column:span 1; } }
+
 /* =====================================================================
    Dapur Ina Aina — UI refresh / babak 2
    Menu, keranjang, checkout, pembayaran, riwayat, login & admin.
@@ -758,16 +764,15 @@ footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--ink-mu
   align-items: stretch;
 }
 
-/* ---------- Sidebar (tema terang, aksen oranye — sesuai referensi) ---------- */
+/* ---------- Sidebar ---------- */
 .admin-sidebar {
   width: 264px;
   flex-shrink: 0;
-  background: #FFFDF8;
-  color: var(--ink);
-  border-right: 1px solid var(--line);
+  background: var(--leaf-dark, #1E3129);
+  color: #F3EFE3;
   display: flex;
   flex-direction: column;
-  padding: 22px 16px;
+  padding: 24px 18px;
   position: sticky;
   top: 0;
   height: 100vh;
@@ -778,96 +783,82 @@ footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--ink-mu
   align-items: center;
   gap: 12px;
   text-decoration: none !important;
-  padding: 4px 6px 20px;
-  margin-bottom: 10px;
+  padding: 6px 8px 22px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
 }
-.admin-brand .brand-mark {
-  width: 42px;
-  height: 42px;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  background: linear-gradient(150deg, var(--chili), var(--chili-dark));
-  color: #fff;
-}
+.admin-brand .brand-mark { width: 42px; height: 42px; font-size: 1.2rem; flex-shrink: 0; }
 .admin-brand-copy { display: grid; line-height: 1.3; }
-.admin-brand-copy strong { font-family: var(--font-display); color: var(--ink); font-size: 1.08rem; }
-.admin-brand-copy strong .accent { color: var(--chili); }
-.admin-brand-copy small { color: var(--ink-muted); font-size: .68rem; letter-spacing: .04em; }
-
-.admin-sidebar-kicker {
-  color: var(--ink-muted);
-  font-size: .68rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: 4px 10px 10px;
-}
+.admin-brand-copy strong { font-family: var(--font-display); color: #fff; font-size: 1.05rem; }
+.admin-brand-copy small { color: rgba(255,255,255,.55); font-size: .68rem; letter-spacing: .04em; }
 
 .admin-sidebar-nav { display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .admin-sidebar-nav a {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  color: var(--ink-muted);
-  font-size: .92rem;
+  padding: 11px 12px;
+  border-radius: 11px;
+  color: rgba(255,255,255,.72);
+  font-size: .9rem;
   font-weight: 600;
   text-decoration: none !important;
 }
-.admin-sidebar-nav a:hover { background: #F7F0E4; color: var(--ink); }
-.admin-sidebar-nav a.active { background: var(--chili); color: #fff; box-shadow: 0 8px 18px rgba(193,68,43,.25); }
+.admin-sidebar-nav a:hover { background: rgba(255,255,255,.06); color: #fff; }
+.admin-sidebar-nav a.active { background: rgba(226,173,85,.14); color: #e2ad55; }
 .admin-nav-icon { font-size: 1.05rem; width: 22px; text-align: center; }
 
 .admin-sidebar-footer {
   margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.1);
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 .admin-sidebar-link-muted {
-  color: var(--ink-muted);
+  color: rgba(255,255,255,.55);
   font-size: .8rem;
   text-decoration: none !important;
 }
-.admin-sidebar-link-muted:hover { color: var(--ink); }
+.admin-sidebar-link-muted:hover { color: #fff; }
 .admin-sidebar-user {
-  display: none; /* info admin sekarang tampil di topbar */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,.85);
+  font-size: .85rem;
+  font-weight: 600;
 }
 .admin-sidebar-footer form { margin: 0; }
 .admin-logout-btn {
   width: 100%;
   padding: 9px 12px;
   border-radius: 10px;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  color: var(--ink-muted);
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.8);
   font: inherit;
   font-weight: 600;
   font-size: .84rem;
   cursor: pointer;
   text-align: center;
 }
-.admin-logout-btn:hover { background: #F7F0E4; color: var(--ink); }
+.admin-logout-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
 
-/* ---------- Main column & topbar (selalu tampil, bukan cuma mobile) ---------- */
+/* ---------- Main column ---------- */
 .admin-main-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .admin-topbar {
-  display: flex;
+  display: none;
   align-items: center;
-  justify-content: space-between;
   gap: 14px;
-  padding: 14px 28px;
+  padding: 14px 20px;
   background: var(--paper);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 30;
 }
-.admin-topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.admin-topbar-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 .admin-sidebar-toggle {
   width: 38px;
   height: 38px;
@@ -876,48 +867,8 @@ footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--ink-mu
   background: var(--paper);
   font-size: 1.05rem;
   cursor: pointer;
-  display: none;
-  flex-shrink: 0;
 }
-.admin-topbar-title { font-family: var(--font-display); font-weight: 600; opacity: .55; font-size: .92rem; }
-
-.theme-toggle-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  font-size: 1.05rem;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  color: var(--ink-muted);
-}
-.theme-toggle-btn:hover { background: #F7F0E4; color: var(--ink); }
-
-.topbar-user { display: flex; align-items: center; gap: 10px; }
-.topbar-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--leaf);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: .82rem;
-  flex-shrink: 0;
-}
-.topbar-user-name {
-  font-size: .88rem;
-  font-weight: 600;
-  color: var(--ink);
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
+.admin-topbar-title { font-family: var(--font-display); font-weight: 600; }
 .admin-main { flex: 1; padding: 34px 0 60px; }
 .admin-container { max-width: 1180px; }
 
@@ -935,45 +886,9 @@ footer { border-top: 1px solid var(--line); padding: 26px 0; color: var(--ink-mu
     transform: translateX(0);
     box-shadow: 20px 0 60px rgba(0,0,0,.25);
   }
-  .admin-sidebar-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .admin-topbar { display: flex; }
   .admin-main { padding-top: 22px; }
-  .topbar-user-name { display: none; }
 }
-
-/* ---------- Mode gelap khusus panel admin ---------- */
-html[data-admin-theme="dark"] .admin-body { background: #171310; }
-html[data-admin-theme="dark"] .admin-sidebar { background: #1C1712; border-color: #322A22; }
-html[data-admin-theme="dark"] .admin-brand-copy strong { color: #F3EFE3; }
-html[data-admin-theme="dark"] .admin-sidebar-nav a { color: #B8AC98; }
-html[data-admin-theme="dark"] .admin-sidebar-nav a:hover { background: #2A231B; color: #F3EFE3; }
-html[data-admin-theme="dark"] .admin-sidebar-footer { border-color: #322A22; }
-html[data-admin-theme="dark"] .admin-logout-btn { background: #241E17; border-color: #322A22; color: #B8AC98; }
-html[data-admin-theme="dark"] .admin-topbar { background: #1C1712; border-color: #322A22; }
-html[data-admin-theme="dark"] .theme-toggle-btn { background: #241E17; border-color: #322A22; color: #B8AC98; }
-html[data-admin-theme="dark"] .topbar-user-name { color: #F3EFE3; }
-html[data-admin-theme="dark"] .admin-main .card,
-html[data-admin-theme="dark"] .admin-main .table-wrap,
-html[data-admin-theme="dark"] .admin-main table,
-html[data-admin-theme="dark"] .admin-main .stat-card,
-html[data-admin-theme="dark"] .admin-main .filter-bar,
-html[data-admin-theme="dark"] .admin-main .receipt {
-  background: #211B15;
-  border-color: #322A22;
-}
-html[data-admin-theme="dark"] .admin-main th,
-html[data-admin-theme="dark"] .admin-main td { border-color: #322A22; color: #EAE3D4; }
-html[data-admin-theme="dark"] .admin-main h1,
-html[data-admin-theme="dark"] .admin-main h2,
-html[data-admin-theme="dark"] .admin-main h3 { color: #F3EFE3; }
-html[data-admin-theme="dark"] .admin-main input,
-html[data-admin-theme="dark"] .admin-main select,
-html[data-admin-theme="dark"] .admin-main textarea {
-  background: #171310;
-  border-color: #322A22;
-  color: #F3EFE3;
-}
-html[data-admin-theme="dark"] .admin-main .page-header { border-color: #322A22; }
-html[data-admin-theme="dark"] .admin-main .modal-box { background: #211B15; }
 
 /* =====================================================================
    Dapur Ina Aina — Foto produk (menu & admin)
